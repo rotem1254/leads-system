@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>דוגמה — שליחת ליד ל-API</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 480px;
+        margin: 2rem auto;
+        padding: 1rem;
+      }
+      label {
+        display: block;
+        margin-top: 0.75rem;
+        font-weight: 600;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 0.5rem;
+        margin-top: 0.25rem;
+        box-sizing: border-box;
+      }
+      button {
+        margin-top: 1rem;
+        padding: 0.6rem 1rem;
+        cursor: pointer;
+      }
+      .msg {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+      }
+      .ok {
+        background: #ecfdf5;
+        color: #065f46;
+      }
+      .err {
+        background: #fef2f2;
+        color: #991b1b;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>טופס ליד (דוגמה)</h1>
+    <p>
+      החלף את <code>API_BASE</code> בכתובת הפריסה של מערכת הלידים, ואת
+      <code>LANDING_TOKEN</code> בטוקן מדף הנחיתה בלוח הבקרה (מתחיל ב-
+      <code>lp_</code>).
+    </p>
+
+    <form id="lead-form">
+      <label>שם מלא *</label>
+      <input name="full_name" required />
+
+      <label>טלפון *</label>
+      <input name="phone" required dir="ltr" />
+
+      <label>אימייל</label>
+      <input name="email" type="email" dir="ltr" />
+
+      <label>הודעה</label>
+      <textarea name="message" rows="3"></textarea>
+
+      <!-- מטא-דאטה מהדף — נשמר לצורך דוחות; הבעלות נקבעת בשרת לפי landing_token -->
+      <input type="hidden" name="page_source" value="demo-landing-v1" />
+      <input type="hidden" name="landing_token" value="lp_REPLACE_ME" />
+
+      <button type="submit">שליחה</button>
+    </form>
+    <div id="feedback" class="msg" style="display: none"></div>
+
+    <script>
+      const API_BASE = "https://YOUR-DOMAIN.com";
+      const LANDING_TOKEN = "lp_REPLACE_ME";
+
+      const form = document.getElementById("lead-form");
+      const feedback = document.getElementById("feedback");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        feedback.style.display = "none";
+
+        const fd = new FormData(form);
+        const token = (fd.get("landing_token") || LANDING_TOKEN || "").trim();
+        const payload = {
+          full_name: fd.get("full_name").trim(),
+          phone: fd.get("phone").trim(),
+          email: (fd.get("email") || "").trim(),
+          message: (fd.get("message") || "").trim(),
+          page_source: fd.get("page_source").trim(),
+          landing_token: token,
+        };
+
+        try {
+          const res = await fetch(`${API_BASE}/api/leads`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            throw new Error(data.message || "שגיאה בשליחה");
+          }
+
+          feedback.textContent = data.message || "נשלח בהצלחה!";
+          feedback.className = "msg ok";
+          feedback.style.display = "block";
+          form.reset();
+        } catch (err) {
+          feedback.textContent = err.message || "שגיאה";
+          feedback.className = "msg err";
+          feedback.style.display = "block";
+        }
+      });
+    </script>
+  </body>
+</html>

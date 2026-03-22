@@ -1,0 +1,394 @@
+מעולה 🔥
+אני בונה לך עכשיו **תוכנית עבודה מלאה + אפיון טכני ראשוני**, ברמה שאתה יכול לקחת את זה ישר ל־Cursor ולהתחיל לבנות בלי להסתבך.
+
+---
+
+# 🚀 מערכת לידים – אפיון מלא + שלבי ביצוע
+
+## 🧠 Overview
+
+מערכת פשוטה, יציבה, וסקיילבילית:
+
+* כל דף נחיתה → שולח טופס
+* כל הטפסים → נכנסים ל־API אחד
+* כל הנתונים → נשמרים במסד אחד
+* אתה → מנהל הכל ממסך אחד
+
+---
+
+# 🏗️ ארכיטקטורה
+
+```text
+Landing Pages (HTML)
+        ↓
+   POST /api/leads
+        ↓
+Node.js Server (Render)
+        ↓
+Supabase (PostgreSQL)
+        ↓
+Admin Dashboard (ניהול לידים)
+```
+
+---
+
+# ⚙️ שלב 1 – פתיחת תשתיות (חובה)
+
+## 1.1 פתיחת Supabase
+
+לך ל:
+👉 [https://supabase.com](https://supabase.com)
+
+תעשה:
+
+* Create Project
+* שמור:
+
+  * `SUPABASE_URL`
+  * `SUPABASE_ANON_KEY`
+
+---
+
+## 1.2 יצירת טבלת leads
+
+לך ל־SQL Editor והרץ:
+
+```sql
+create table leads (
+  id uuid primary key default uuid_generate_v4(),
+  full_name text,
+  phone text,
+  email text,
+  message text,
+  page_source text,
+  status text default 'new',
+  created_at timestamp default now(),
+  updated_at timestamp default now()
+);
+```
+
+---
+
+## 1.3 פתיחת Render
+
+👉 [https://render.com](https://render.com)
+
+* New Web Service
+* חבר GitHub
+* נעלה לשם את השרת
+
+---
+
+# 🧩 שלב 2 – בניית Backend
+
+## 📁 מבנה תיקיות
+
+```text
+server/
+│
+├── app.js
+├── routes/
+│   └── leads.js
+├── controllers/
+│   └── leadsController.js
+├── services/
+│   └── leadsService.js
+├── config/
+│   └── supabase.js
+├── middleware/
+│   └── validate.js
+├── .env
+└── package.json
+```
+
+---
+
+## 📦 התקנות
+
+```bash
+npm init -y
+npm install express cors dotenv @supabase/supabase-js
+```
+
+---
+
+## ⚙️ app.js
+
+```js
+const express = require('express')
+const cors = require('cors')
+require('dotenv').config()
+
+const leadsRoutes = require('./routes/leads')
+
+const app = express()
+
+app.use(cors())
+app.use(express.json())
+
+app.use('/api/leads', leadsRoutes)
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000')
+})
+```
+
+---
+
+## 🔌 חיבור ל־Supabase
+
+### config/supabase.js
+
+```js
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+)
+
+module.exports = supabase
+```
+
+---
+
+## 🧠 service – לוגיקה
+
+### services/leadsService.js
+
+```js
+const supabase = require('../config/supabase')
+
+exports.createLead = async (data) => {
+  return await supabase.from('leads').insert([data])
+}
+
+exports.getLeads = async () => {
+  return await supabase.from('leads').select('*').order('created_at', { ascending: false })
+}
+
+exports.updateLead = async (id, data) => {
+  return await supabase.from('leads').update(data).eq('id', id)
+}
+
+exports.deleteLead = async (id) => {
+  return await supabase.from('leads').delete().eq('id', id)
+}
+```
+
+---
+
+## 🎯 controller
+
+### controllers/leadsController.js
+
+```js
+const leadsService = require('../services/leadsService')
+
+exports.createLead = async (req, res) => {
+  try {
+    const { full_name, phone } = req.body
+
+    if (!full_name || !phone) {
+      return res.status(400).json({ error: 'Missing required fields' })
+    }
+
+    const result = await leadsService.createLead({
+      ...req.body,
+      status: 'new'
+    })
+
+    res.json({ success: true, data: result })
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' })
+  }
+}
+
+exports.getLeads = async (req, res) => {
+  const result = await leadsService.getLeads()
+  res.json(result)
+}
+
+exports.updateLead = async (req, res) => {
+  const { id } = req.params
+  const result = await leadsService.updateLead(id, req.body)
+  res.json(result)
+}
+
+exports.deleteLead = async (req, res) => {
+  const { id } = req.params
+  const result = await leadsService.deleteLead(id)
+  res.json(result)
+}
+```
+
+---
+
+## 🔗 routes
+
+### routes/leads.js
+
+```js
+const express = require('express')
+const router = express.Router()
+const controller = require('../controllers/leadsController')
+
+router.post('/', controller.createLead)
+router.get('/', controller.getLeads)
+router.put('/:id', controller.updateLead)
+router.delete('/:id', controller.deleteLead)
+
+module.exports = router
+```
+
+---
+
+# 🌐 שלב 3 – חיבור טופס בדף נחיתה
+
+## דוגמה לטופס
+
+```html
+<form id="leadForm">
+  <input type="text" placeholder="שם מלא" name="full_name" required />
+  <input type="tel" placeholder="טלפון" name="phone" required />
+  <input type="email" placeholder="אימייל" name="email" />
+  <textarea name="message"></textarea>
+
+  <button type="submit">שלח</button>
+</form>
+
+<script>
+document.getElementById('leadForm').addEventListener('submit', async (e) => {
+  e.preventDefault()
+
+  const form = e.target
+
+  const data = {
+    full_name: form.full_name.value,
+    phone: form.phone.value,
+    email: form.email.value,
+    message: form.message.value,
+    page_source: 'landing-classa'
+  }
+
+  await fetch('https://YOUR-RENDER-URL/api/leads', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+
+  alert('נשלח בהצלחה')
+})
+</script>
+```
+
+---
+
+# 📊 שלב 4 – מסך ניהול לידים
+
+## מה יהיה בו
+
+טבלה:
+
+| שם | טלפון | מקור | סטטוס | תאריך | פעולות |
+| -- | ----- | ---- | ----- | ----- | ------ |
+
+### פעולות:
+
+* שינוי סטטוס
+* מחיקה
+* צפייה
+
+---
+
+## דוגמה פשוטה
+
+```js
+fetch('/api/leads')
+  .then(res => res.json())
+  .then(data => {
+    console.log(data)
+  })
+```
+
+---
+
+# 🔐 שלב 5 – אבטחה בסיסית
+
+חובה:
+
+* ולידציה ל־שם + טלפון
+* חסימת שליחה ריקה
+* CORS
+* .env
+
+מומלץ:
+
+* token admin פשוט
+* rate limit בעתיד
+
+---
+
+# 🚀 שלב 6 – העלאה ל־Render
+
+1. מעלים ל־GitHub
+2. מחברים ל־Render
+3. מוסיפים ENV:
+
+```env
+SUPABASE_URL=...
+SUPABASE_KEY=...
+```
+
+4. Deploy
+
+---
+
+# 🧪 שלב 7 – בדיקות
+
+תבדוק:
+
+✅ טופס נשלח
+✅ הנתונים נשמרים
+✅ מופיעים בטבלה
+✅ אפשר למחוק
+✅ אפשר לשנות סטטוס
+✅ כל דף מזהה מקור
+
+---
+
+# 🧠 שדרוגים עתידיים (לא עכשיו)
+
+* שליחה ל־WhatsApp
+* מערכת משתמשים
+* דשבורד מתקדם
+* AI סיווג לידים
+* חיבור CRM
+
+---
+
+# 🧨 סיכום
+
+יש לך עכשיו מערכת:
+
+✔ פשוטה
+✔ יציבה
+✔ סקיילבילית
+✔ מוכנה לשימוש אמיתי
+
+---
+
+## 🔥 השלב הבא (מומלץ מאוד)
+
+אם אתה רוצה — אני יכול עכשיו לבנות לך:
+
+👉 **Prompt אחד מטורף ל־Cursor**
+שיבנה לך את כל המערכת הזאת אוטומטית כולל UI ברמה גבוהה
+
+או
+
+👉 לבנות לך **Dashboard יפה מוכן עם Bootstrap + אנימציות**
+
+תגיד לי מה בא לך next 😈

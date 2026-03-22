@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ניהול לידים</title>
+  <link rel="stylesheet" href="/admin/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="bg-pattern" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div>
+        <h1>ניהול לידים</h1>
+        <p class="subtitle">כל הטפסים מכל דפי הנחיתה במקום אחד</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button type="button" id="btnRefresh" class="btn btn-ghost">רענן</button>
+      <button type="button" id="btnLogout" class="btn btn-outline" hidden>התנתק</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section id="panelLogin" class="card login-card">
+      <h2>התחברות</h2>
+      <p class="hint">הזן את ה־token שהוגדר ב־<code>ADMIN_TOKEN</code> בשרת.</p>
+      <label class="field">
+        <span>טוקן אדמין</span>
+        <input type="password" id="adminToken" autocomplete="off" placeholder="הדבק כאן" />
+      </label>
+      <button type="button" id="btnLogin" class="btn btn-primary">כניסה</button>
+      <p id="loginError" class="error" role="alert" hidden></p>
+    </section>
+
+    <section id="panelDash" class="dash" hidden>
+      <div class="toolbar card">
+        <div class="stats" id="stats"></div>
+        <div class="toolbar-right">
+          <label class="field inline">
+            <span>חיפוש</span>
+            <input type="search" id="q" placeholder="שם, טלפון, מקור…" />
+          </label>
+        </div>
+      </div>
+
+      <div class="card table-wrap">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>שם</th>
+                <th>טלפון</th>
+                <th>מקור</th>
+                <th>סטטוס</th>
+                <th>תאריך</th>
+                <th class="col-actions">פעולות</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <p id="emptyState" class="empty" hidden>אין לידים עדיין.</p>
+        <p id="loadError" class="error" role="alert" hidden></p>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal" hidden aria-modal="true" role="dialog">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-panel card">
+      <div class="modal-head">
+        <h2 id="modalTitle">פרטי ליד</h2>
+        <button type="button" class="icon-btn" id="modalClose" aria-label="סגור">×</button>
+      </div>
+      <dl class="detail" id="detail"></dl>
+    </div>
+  </div>
+
+  <script src="/admin/app.js" defer></script>
+</body>
+</html>

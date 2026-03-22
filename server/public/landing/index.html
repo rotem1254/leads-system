@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>דף נחיתה — דוגמה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #070a12;
+      --card: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.14);
+      --text: #eef2ff;
+      --muted: #9aa3b8;
+      --accent: #6ee7ff;
+      --accent2: #a78bfa;
+      --radius: 18px;
+      font-family: "Heebo", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 80% 10%, rgba(110, 231, 255, 0.12), transparent 55%),
+        radial-gradient(700px 400px at 10% 90%, rgba(167, 139, 250, 0.12), transparent 50%),
+        var(--bg);
+    }
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: clamp(1.5rem, 5vw, 3rem);
+    }
+    .hero {
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+    @media (min-width: 900px) {
+      .hero { grid-template-columns: 1.1fr 0.9fr; }
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.25);
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    h1 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      line-height: 1.15;
+      margin: 0.75rem 0 0;
+      font-weight: 700;
+    }
+    .lead {
+      margin: 1rem 0 0;
+      font-size: 1.1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 52ch;
+    }
+    .bullets {
+      margin: 1.5rem 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.65rem;
+    }
+    .bullets li {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-start;
+      color: #c9d4f0;
+    }
+    .bullets li::before {
+      content: "✓";
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(10px);
+    }
+    .card h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.25rem;
+    }
+    .hint {
+      margin: 0 0 1rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.75rem 0.9rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.35);
+      color: var(--text);
+      font: inherit;
+      margin-bottom: 1rem;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    button[type="submit"] {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 0.85rem;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      color: #0a0f1f;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+    }
+    button[type="submit"]:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .msg {
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      min-height: 1.25em;
+    }
+    .msg.ok { color: #86efac; }
+    .msg.err { color: #fecaca; }
+    footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <span class="badge">דף נחיתה לדוגמה · מערכת לידים</span>
+        <h1>השאירו פרטים — ונחזור אליכם מהר</h1>
+        <p class="lead">
+          זהו דף נחיתה הדגמה שמחובר ל־API אחד. כל שליחה נרשמת עם מקור הדף
+          (<code>page_source</code>) כדי שתדעו מאיזה קמפיין הגיע הליד.
+        </p>
+        <ul class="bullets">
+          <li>שליחה מאובטחת ל־<code>/api/leads</code></li>
+          <li>שדות חובה: שם וטלפון (כמו באפיון)</li>
+          <li>מקור דף: <strong>landing-classa</strong> (ניתן לשנות בקוד)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>טופס יצירת קשר</h2>
+        <p class="hint">השדות המסומנים בכוכבית הם חובה.</p>
+        <form id="leadForm" novalidate>
+          <div>
+            <label for="full_name">שם מלא *</label>
+            <input type="text" id="full_name" name="full_name" required placeholder="למשל: יוסי כהן" autocomplete="name" />
+          </div>
+          <div>
+            <label for="phone">טלפון *</label>
+            <input type="tel" id="phone" name="phone" required placeholder="050-0000000" autocomplete="tel" />
+          </div>
+          <div>
+            <label for="email">אימייל</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div>
+            <label for="message">הודעה</label>
+            <textarea id="message" name="message" placeholder="איך נוכל לעזור?"></textarea>
+          </div>
+          <button type="submit" id="submitBtn">שלח</button>
+          <p id="formMsg" class="msg" role="status"></p>
+        </form>
+      </div>
+    </div>
+    <footer>מחובר לאותו שרת שמשרת את לוח הניהול · <a href="/admin/" style="color:#a5b4fc">לוח ניהול</a></footer>
+  </div>
+  <script>
+    const API_URL = window.location.origin + "/api/leads";
+
+    const form = document.getElementById("leadForm");
+    const msg = document.getElementById("formMsg");
+    const btn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.textContent = "";
+      msg.className = "msg";
+
+      const full_name = form.full_name.value.trim();
+      const phone = form.phone.value.trim();
+      if (!full_name || !phone) {
+        msg.textContent = "נא למלא שם וטלפון.";
+        msg.classList.add("err");
+        return;
+      }
+
+      const data = {
+        full_name,
+        phone,
+        email: form.email.value.trim() || null,
+        message: form.message.value.trim() || null,
+        page_source: "landing-classa"
+      };
+
+      btn.disabled = true;
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        const j = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          msg.textContent = j.error || "שגיאה בשליחה. נסו שוב.";
+          msg.classList.add("err");
+          return;
+        }
+        msg.textContent = "נשלח בהצלחה — תודה!";
+        msg.classList.add("ok");
+        form.reset();
+      } catch {
+        msg.textContent = "אין חיבור לשרת. בדקו את הכתובת או הרשת.";
+        msg.classList.add("err");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
